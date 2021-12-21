@@ -7,11 +7,9 @@ namespace CoreApi.HelperCodes.Enumerate
         public enum StatusTypeEnum 
         {
             [Description("Not Determined")]
-            Na = -1,
-            
+            Na = -1,            
             [Description("Active")]
-            Active = 1, 
-            
+            Active = 1,             
             [Description("Deleted")]
             Deleted = 2
         }

@@ -25,5 +25,34 @@ namespace CoreApi.Controllers.Base
                     PreserveReferencesHandling = PreserveReferencesHandling.None
                 }); 
         }
+
+        protected string ResReturner(ResultModel resultModel)
+        {
+            if (resultModel.IsSuccess)
+            {
+                return JsonConvert.SerializeObject(resultModel, Formatting.Indented,
+                    new JsonSerializerSettings
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                        PreserveReferencesHandling = PreserveReferencesHandling.None,
+                        DateFormatString = "dd.MM.yyy hh:mm:ss"
+                    });
+            }
+            else
+            {
+                resultModel.Messages = new List<string>
+                {
+                    "An error occurred during operation."
+                };
+            } 
+
+            return JsonConvert.SerializeObject(resultModel, Formatting.Indented,
+                new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    PreserveReferencesHandling = PreserveReferencesHandling.None,
+                    DateFormatString = "dd.MM.yyy hh:mm:ss"
+                });
+        }
     }
 }

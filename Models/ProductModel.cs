@@ -7,7 +7,7 @@ namespace CoreApi.Models
     public class ProductModel : IdentifiedServiceModel
     {
         [DataMember]
-        public int CompanyId { get; set; }
+        public string CompanyUniqueId { get; set; }
 
         [DataMember]
         public string BatchNumber { get; set; }
@@ -26,7 +26,7 @@ namespace CoreApi.Models
 
         [DataMember]
         public decimal Price { get; set; } 
-
+ 
         public override string GetDomainName()
         {
             return "Product";
