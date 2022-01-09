@@ -9,7 +9,7 @@ namespace CoreApi.Models.Base
         public virtual int Id { get; set; }   
 
         [DataMember]
-        public virtual string UniqueId { get; set; } 
+        public virtual string UniqueId { get; set; }  
         
         public abstract string GetDomainName();
     }
