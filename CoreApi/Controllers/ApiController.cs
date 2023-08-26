@@ -14,6 +14,7 @@ using System.Dynamic;
 
 namespace CoreApi.Controllers
 {
+    [ApiController]
     [Route("[controller]")]
     public class ApiController : ApiBaseController
     {
