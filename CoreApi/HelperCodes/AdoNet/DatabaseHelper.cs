@@ -6,9 +6,7 @@ using CoreApi.HelperCodes.Miscellaneous;
 using System.ComponentModel;
 using System.Text;
 using System.Linq;
-using CoreApi.HelperCodes.Enumerate;
-using System.Collections.Generic;
-using CoreApi.HelperCodes;
+using CoreApi.HelperCodes.Enumerate; 
 
 namespace CoreApi.HelperCodes.AdoNet
 {

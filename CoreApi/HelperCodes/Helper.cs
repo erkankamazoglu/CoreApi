@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
-using AutoMapper.Configuration.Conventions;
+using System.Text; 
+using CoreApi.HelperCodes.Attributes;
 
 namespace CoreApi.HelperCodes
 {
@@ -47,7 +47,7 @@ namespace CoreApi.HelperCodes
                 foreach (object attr in attrs)
                 {
                     //MapTo Attribute Check 
-                    MapToAttribute mapToAttr = attr as MapToAttribute;
+                    CustomMapTo mapToAttr = attr as CustomMapTo;
                     if (mapToAttr != null)
                     {
                         string maptoName = mapToAttr.MatchingName;
