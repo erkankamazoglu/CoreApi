@@ -46,7 +46,7 @@ namespace CoreApi.Controllers
             HashSet<string> deleteUniqueIdList = baseModelUniqueIdList.Except(serviceModelUniqueIdList).ToHashSet();
             HashSet<string> updateUniqueIdList = baseModelUniqueIdList.Intersect(serviceModelUniqueIdList).ToHashSet();
 
-            Dictionary<string, string> serviceModelPropDictionary = Helper.IdentifiedBaseServiceModelMappedProps(serviceModelType);
+            Dictionary<string, string> serviceModelPropDictionary = Helper.IdentifiedBaseServiceModelMappedProps(serviceModelType); 
             string updateTempTableQuery = Helper.GetUpdateTempTableQuery(serviceModelPropDictionary);
 
             bool isOk = true;

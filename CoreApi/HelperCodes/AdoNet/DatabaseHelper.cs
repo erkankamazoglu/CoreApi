@@ -5,7 +5,10 @@ using System.Data.SqlClient;
 using CoreApi.HelperCodes.Miscellaneous;
 using System.ComponentModel;
 using System.Text;
+using System.Linq;
 using CoreApi.HelperCodes.Enumerate;
+using System.Collections.Generic;
+using CoreApi.HelperCodes;
 
 namespace CoreApi.HelperCodes.AdoNet
 {
@@ -43,24 +46,28 @@ namespace CoreApi.HelperCodes.AdoNet
 
             if (!string.IsNullOrEmpty(updateTempTableQuery))
             {
-                updateTempTableQuery.Replace("#tempTableName#", tempTableName);
+                updateTempTableQuery = updateTempTableQuery.Replace("#tempTableName#", tempTableName);
             }
 
             StringBuilder createTempTableQuerySb = new StringBuilder("CREATE TABLE " + tempTableName + " (");
             StringBuilder insertQuerySb = new StringBuilder("INSERT INTO " + tableName + " (");
             StringBuilder selectTempTableQuerySb = new StringBuilder("SELECT ");
 
-            bool isFirstAppendQuery = true; 
+            bool isFirstTempQuery = true, isFirstInsertQuery = true;
             foreach (DataColumn dc in dt.Columns)
             {
                 string mappingType = GetMappingTypeName(dc.DataType);
                 string columnName = dc.ColumnName;
+                createTempTableQuerySb.Append((!isFirstTempQuery ? ", " : "") + columnName + " " + mappingType);
 
-                createTempTableQuerySb.Append((!isFirstAppendQuery ? ", " : "") + columnName + " " + mappingType);
-                selectTempTableQuerySb.Append((!isFirstAppendQuery ? ", " : "") + columnName);
-                insertQuerySb.Append((!isFirstAppendQuery ? ", " : "") + columnName);
+                if (!Helper.ColumnListToExtract().Any(i => i == columnName))
+                {
+                    selectTempTableQuerySb.Append((!isFirstInsertQuery ? ", " : "") + columnName);
+                    insertQuerySb.Append((!isFirstInsertQuery ? ", " : "") + columnName);
 
-                isFirstAppendQuery = false;
+                    isFirstInsertQuery = false;
+                }
+                isFirstTempQuery = false;
             }
 
             createTempTableQuerySb.Append(" );");
@@ -70,7 +77,7 @@ namespace CoreApi.HelperCodes.AdoNet
             insertQuerySb.Append("FROM " + tempTableName + "; ");
             insertQuerySb.Append("DROP TABLE " + tempTableName + ";");
 
-             bool isOk = CommitToDatabaseWithTempTable(dt, createTempTableQuerySb.ToString(), updateTempTableQuery, insertQuerySb.ToString(), tempTableName); 
+            bool isOk = CommitToDatabaseWithTempTable(dt, createTempTableQuerySb.ToString(), updateTempTableQuery, insertQuerySb.ToString(), tempTableName);
 
             return isOk;
         }
@@ -90,9 +97,9 @@ namespace CoreApi.HelperCodes.AdoNet
             string tempTableName = "#TempBulkUpdateTable_" + rnd;
 
             StringBuilder createTempTableQuerySb = new StringBuilder("CREATE TABLE " + tempTableName + " (");
-            StringBuilder updateQuerySb = new StringBuilder("UPDATE T SET "); 
+            StringBuilder updateQuerySb = new StringBuilder("UPDATE T SET ");
 
-            bool isFirstTempQuery = true, isFirstUpdateQuery = true; 
+            bool isFirstTempQuery = true, isFirstUpdateQuery = true;
             foreach (DataColumn dc in dt.Columns)
             {
                 string mappingType = GetMappingTypeName(dc.DataType);
@@ -100,8 +107,8 @@ namespace CoreApi.HelperCodes.AdoNet
 
                 createTempTableQuerySb.Append((!isFirstTempQuery ? ", " : "") + columnName + " " + mappingType);
                 isFirstTempQuery = false;
-
-                if (!isDeleted && dc.ColumnName != "Id")
+ 
+                if (!isDeleted && !Helper.ColumnListToExtract().Any(i => i == columnName))
                 {
                     updateQuerySb.Append((!isFirstUpdateQuery ? ", " : "") + "T." + columnName + " = " + "Temp." + columnName);
                     isFirstUpdateQuery = false;
@@ -110,17 +117,17 @@ namespace CoreApi.HelperCodes.AdoNet
 
             createTempTableQuerySb.Append(" )");
 
-            if (isDeleted) 
-                updateQuerySb.Append("T.StatusType = " + (int)Enums.StatusTypeEnum.Deleted + ", DeleteDate = GetDate() ");  
-            else 
-                updateQuerySb.Append(", T.UpdateDate = GetDate() ");   
+            if (isDeleted)
+                updateQuerySb.Append("T.StatusType = " + (int)Enums.StatusTypeEnum.Deleted + ", DeleteDate = GetDate() ");
+            else
+                updateQuerySb.Append(", T.UpdateDate = GetDate() ");
 
 
             updateQuerySb.Append("FROM " + tableName + " T ");
             updateQuerySb.Append("INNER JOIN " + tempTableName + " Temp ON T." + updateKey + " = Temp." + updateKey + "; ");
             updateQuerySb.Append("DROP TABLE " + tempTableName + ";");
 
-            bool isOk = CommitToDatabaseWithTempTable(dt, createTempTableQuerySb.ToString(), updateTempTableQuery, updateQuerySb.ToString(), tempTableName); 
+            bool isOk = CommitToDatabaseWithTempTable(dt, createTempTableQuerySb.ToString(), updateTempTableQuery, updateQuerySb.ToString(), tempTableName);
 
             return isOk;
         }
@@ -173,7 +180,7 @@ namespace CoreApi.HelperCodes.AdoNet
                         conn.Close();
                     }
                 }
-            } 
+            }
             return isOk;
         }
 

@@ -6,7 +6,7 @@ using AutoMapper.Configuration.Conventions;
 
 namespace CoreApi.HelperCodes
 {
-    public class Helper
+    public static class Helper
     {
         public static bool ModelCheckName(string sourceName, string targetName)
         {
@@ -91,6 +91,13 @@ namespace CoreApi.HelperCodes
             } 
             
             return updateTempQuerySb.ToString();
+        }
+
+        public static List<string> ColumnListToExtract()
+        {
+            return new List<string> {
+                "CompanyUniqueId"
+            }; 
         }
     }
 }
